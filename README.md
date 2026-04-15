@@ -1,5 +1,50 @@
 # Spring Boot Cheatsheet
 
+<details>
+    <summary>Project Structure</summary>
+    
+```
+my-service/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/company/myservice/
+│   │   │       ├── MyServiceApplication.java   ← entry point (@SpringBootApplication)
+│   │   │       ├── controller/
+│   │   │       │   └── ProductController.java  ← HTTP layer (@RestController)
+│   │   │       ├── service/
+│   │   │       │   └── ProductService.java     ← business logic (@Service)
+│   │   │       ├── repository/
+│   │   │       │   └── ProductRepository.java  ← data access (@Repository)
+│   │   │       └── model/
+│   │   │           └── Product.java            ← data model (@Entity)
+│   │   └── resources/
+│   │       └── application.properties          ← configuration (DB url, port, etc.)
+│   └── test/
+│       └── java/                               ← tests live here
+└── pom.xml                                     ← Maven dependencies
+```
+</details>
+
+## Layer Responsibilities
+
+| Layer | Annotation | Responsibility | Express equivalent |
+|---|---|---|---|
+| Controller | `@RestController` | Receive HTTP requests, return responses | Route handlers |
+| Service | `@Service` | Business logic, orchestration | Data services / business logic |
+| Repository | `@Repository` | Database access only | Mongoose models / DB queries |
+| Model | `@Entity` (JPA) | Data structure / database table | Mongoose schema |
+
+## Key Concepts Summary
+
+| Concept | What it means |
+|---|---|
+| **IoC Container** | Spring manages object creation and wiring — you don't call `new` |
+| **Dependency Injection** | Spring injects dependencies into your classes automatically |
+| **Auto-configuration** | Spring Boot configures itself based on what's on the classpath |
+| **Embedded server** | Tomcat runs inside your app — no external server setup needed |
+| **JPA (Jakarta)** | Java Persistence API — standard way to interact with databases in Java |
+| **Lombok** | Library that generates boilerplate (getters, setters, constructors) via annotations |
 ## Stereotype Annotations
 Tell Spring what a class is so it can manage it automatically.
 
@@ -14,7 +59,6 @@ Tell Spring what a class is so it can manage it automatically.
 
 > **Express analogy:** `@RestController` = route handlers, `@Service` = data services, `@Repository` = DB access layer
 
----
 
 ## Wiring Annotations
 Tell Spring how to connect components together.
@@ -26,8 +70,6 @@ Tell Spring how to connect components together.
 | `@SpringBootApplication` | Entry point annotation — combines `@Configuration`, `@EnableAutoConfiguration`, `@ComponentScan` |
 
 > **Jest analogy:** `@Autowired` is like dependency injection in testing — Spring injects real (or mock) dependencies so you don't call `new` yourself.
-
----
 
 ## Web / HTTP Annotations
 Map HTTP requests to Java methods.
@@ -49,7 +91,6 @@ Map HTTP requests to Java methods.
 | `@PathVariable` | Extract variable from URL path | `req.params.id` |
 | `@RequestParam` | Extract query parameter from URL | `req.query.page` |
 
----
 
 ## Quick Code Reference
 
@@ -139,43 +180,6 @@ public class Product {
 }
 ```
 
----
-
-## Project Structure
-
-```
-my-service/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/company/myservice/
-│   │   │       ├── MyServiceApplication.java   ← entry point (@SpringBootApplication)
-│   │   │       ├── controller/
-│   │   │       │   └── ProductController.java  ← HTTP layer (@RestController)
-│   │   │       ├── service/
-│   │   │       │   └── ProductService.java     ← business logic (@Service)
-│   │   │       ├── repository/
-│   │   │       │   └── ProductRepository.java  ← data access (@Repository)
-│   │   │       └── model/
-│   │   │           └── Product.java            ← data model (@Entity)
-│   │   └── resources/
-│   │       └── application.properties          ← configuration (DB url, port, etc.)
-│   └── test/
-│       └── java/                               ← tests live here
-└── pom.xml                                     ← Maven dependencies
-```
-
-### Layer Responsibilities
-
-| Layer | Annotation | Responsibility | Express equivalent |
-|---|---|---|---|
-| Controller | `@RestController` | Receive HTTP requests, return responses | Route handlers |
-| Service | `@Service` | Business logic, orchestration | Data services / business logic |
-| Repository | `@Repository` | Database access only | Mongoose models / DB queries |
-| Model | `@Entity` | Data structure / database table | Mongoose schema |
-
----
-
 ## application.properties Quick Reference
 
 ```properties
@@ -233,16 +237,3 @@ spring.application.name=product-service
     <scope>test</scope>
 </dependency>
 ```
-
----
-
-## Key Concepts Summary
-
-| Concept | What it means |
-|---|---|
-| **IoC Container** | Spring manages object creation and wiring — you don't call `new` |
-| **Dependency Injection** | Spring injects dependencies into your classes automatically |
-| **Auto-configuration** | Spring Boot configures itself based on what's on the classpath |
-| **Embedded server** | Tomcat runs inside your app — no external server setup needed |
-| **JPA** | Java Persistence API — standard way to interact with databases in Java |
-| **Lombok** | Library that generates boilerplate (getters, setters, constructors) via annotations |
