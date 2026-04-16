@@ -1,239 +1,131 @@
-# Spring Boot Cheatsheet
+# Microservices Learning Roadmap
 
-<details>
-    <summary>Project Structure</summary>
-    
-```
-my-service/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/company/myservice/
-│   │   │       ├── MyServiceApplication.java   ← entry point (@SpringBootApplication)
-│   │   │       ├── controller/
-│   │   │       │   └── ProductController.java  ← HTTP layer (@RestController)
-│   │   │       ├── service/
-│   │   │       │   └── ProductService.java     ← business logic (@Service)
-│   │   │       ├── repository/
-│   │   │       │   └── ProductRepository.java  ← data access (@Repository)
-│   │   │       └── model/
-│   │   │           └── Product.java            ← data model (@Entity)
-│   │   └── resources/
-│   │       └── application.properties          ← configuration (DB url, port, etc.)
-│   └── test/
-│       └── java/                               ← tests live here
-└── pom.xml                                     ← Maven dependencies
-```
-</details>
+## Key Decisions Made So Far
 
-## Layer Responsibilities
-
-| Layer | Annotation | Responsibility | Express equivalent |
-|---|---|---|---|
-| Controller | `@RestController` | Receive HTTP requests, return responses | Route handlers |
-| Service | `@Service` | Business logic, orchestration | Data services / business logic |
-| Repository | `@Repository` | Database access only | Mongoose models / DB queries |
-| Model | `@Entity` (JPA) | Data structure / database table | Mongoose schema |
-
-## Key Concepts Summary
-
-| Concept | What it means |
-|---|---|
-| **IoC Container** | Spring manages object creation and wiring — you don't call `new` |
-| **Dependency Injection** | Spring injects dependencies into your classes automatically |
-| **Auto-configuration** | Spring Boot configures itself based on what's on the classpath |
-| **Embedded server** | Tomcat runs inside your app — no external server setup needed |
-| **JPA (Jakarta)** | Java Persistence API — standard way to interact with databases in Java |
-| **Lombok** | Library that generates boilerplate (getters, setters, constructors) via annotations |
-## Stereotype Annotations
-Tell Spring what a class is so it can manage it automatically.
-
-| Annotation | Layer | What it does |
+| Decision | Choice | Reason |
 |---|---|---|
-| `@Component` | Any | Generic Spring-managed component |
-| `@Service` | Business Logic | Marks a service class — business logic lives here |
-| `@Repository` | Data Access | Marks a data access class — database logic lives here |
-| `@RestController` | Web | Handles HTTP requests, returns JSON automatically |
-| `@Controller` | Web | Handles HTTP requests, returns views (less common in microservices) |
-| `@Configuration` | Config | Marks a configuration class |
-
-> **Express analogy:** `@RestController` = route handlers, `@Service` = data services, `@Repository` = DB access layer
-
-
-## Wiring Annotations
-Tell Spring how to connect components together.
-
-| Annotation | What it does |
-|---|---|
-| `@Autowired` | Inject a dependency automatically — Spring finds the right class and injects it |
-| `@Bean` | Declare a Spring-managed object inside a `@Configuration` class |
-| `@SpringBootApplication` | Entry point annotation — combines `@Configuration`, `@EnableAutoConfiguration`, `@ComponentScan` |
-
-> **Jest analogy:** `@Autowired` is like dependency injection in testing — Spring injects real (or mock) dependencies so you don't call `new` yourself.
-
-## Web / HTTP Annotations
-Map HTTP requests to Java methods.
-
-| Annotation | HTTP Method | What it does |
-|---|---|---|
-| `@RequestMapping("/path")` | Any | Base path mapping — usually on the class |
-| `@GetMapping("/{id}")` | GET | Handle GET requests |
-| `@PostMapping` | POST | Handle POST requests |
-| `@PutMapping("/{id}")` | PUT | Handle PUT requests |
-| `@DeleteMapping("/{id}")` | DELETE | Handle DELETE requests |
-| `@PatchMapping("/{id}")` | PATCH | Handle PATCH requests |
-
-### Request Data Annotations
-
-| Annotation | What it does | Express equivalent |
-|---|---|---|
-| `@RequestBody` | Extract JSON body from request | `req.body` |
-| `@PathVariable` | Extract variable from URL path | `req.params.id` |
-| `@RequestParam` | Extract query parameter from URL | `req.query.page` |
-
-
-## Quick Code Reference
-
-### Basic REST Controller
-```java
-@RestController
-@RequestMapping("/products")
-public class ProductController {
-
-    @Autowired
-    private ProductService productService;
-
-    @GetMapping
-    public List<Product> getAllProducts() {
-        return productService.findAll();
-    }
-
-    @GetMapping("/{id}")
-    public Product getProduct(@PathVariable Long id) {
-        return productService.findById(id);
-    }
-
-    @PostMapping
-    public Product createProduct(@RequestBody Product product) {
-        return productService.save(product);
-    }
-
-    @PutMapping("/{id}")
-    public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {
-        return productService.update(id, product);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteProduct(@PathVariable Long id) {
-        productService.delete(id);
-    }
-}
-```
-
-### Basic Service
-```java
-@Service
-public class ProductService {
-
-    @Autowired
-    private ProductRepository productRepository;
-
-    public List<Product> findAll() {
-        return productRepository.findAll();
-    }
-
-    public Product findById(Long id) {
-        return productRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Product not found"));
-    }
-
-    public Product save(Product product) {
-        return productRepository.save(product);
-    }
-}
-```
-
-### Basic Repository
-```java
-@Repository
-public interface ProductRepository extends JpaRepository<Product, Long> {
-    // JpaRepository gives you findAll(), findById(), save(), delete() for free
-    // Add custom queries here if needed
-}
-```
-
-### Basic Model (with Lombok)
-```java
-@Entity
-@Data                    // Lombok: generates getters, setters, toString, equals, hashCode
-@NoArgsConstructor       // Lombok: generates no-args constructor
-@AllArgsConstructor      // Lombok: generates all-args constructor
-public class Product {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String name;
-    private String description;
-    private Double price;
-}
-```
-
-## application.properties Quick Reference
-
-```properties
-# Server port (default is 8080)
-server.port=8080
-
-# H2 in-memory database (for development/learning)
-spring.datasource.url=jdbc:h2:mem:testdb
-spring.datasource.driver-class-name=org.h2.Driver
-spring.h2.console.enabled=true
-
-# JPA / Hibernate
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-
-# Application name (important for microservices)
-spring.application.name=product-service
-```
-
+| Repo structure | Monorepo | Easier for solo learning, good overview |
+| IDE | VS Code | Already familiar, Spring Extension Pack works well |
+| Java version | 24 | Latest available |
+| Spring Boot version | 3.5.13 | Latest stable 3.x |
+| Update behavior | Upsert | Simpler for now, 404 handling to be added later |
+| Database | H2 → PostgreSQL | H2 for dev, PostgreSQL in Docker later |
 ---
 
-## pom.xml Key Dependencies
+## Phase 1 — Microservices Concepts
+Big picture understanding of what microservices are and why they exist.
 
-```xml
-<!-- Spring Web — REST APIs -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-web</artifactId>
-</dependency>
+- [x] Monolith vs. microservices
+- [x] Why microservices exist (team autonomy, independent scaling, fault isolation)
+- [x] Tradeoffs (network complexity, more infrastructure, harder debugging)
+- [x] Synchronous communication (REST/HTTP)
+- [x] Asynchronous communication (message queues — Kafka, RabbitMQ)
+- [x] Strangler Fig Pattern — extracting microservices from a monolith
 
-<!-- Spring Data JPA — database access -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-jpa</artifactId>
-</dependency>
 
-<!-- H2 — in-memory database for development -->
-<dependency>
-    <groupId>com.h2database</groupId>
-    <artifactId>h2</artifactId>
-    <scope>runtime</scope>
-</dependency>
+## Phase 2 — Spring Boot
+Building individual microservices in Java.
 
-<!-- Lombok — reduces boilerplate -->
-<dependency>
-    <groupId>org.projectlombok</groupId>
-    <artifactId>lombok</artifactId>
-    <optional>true</optional>
-</dependency>
+- [x] Spring Boot project structure
+- [x] Key annotations (@RestController, @Service, @Repository, @Entity, @Autowired etc.)
+- [x] Dependency injection and IoC container
+- [x] JPA and H2 in-memory database
+- [x] Lombok
+- [x] Full CRUD REST API for `product-service`
+  - GET /products
+  - GET /products/{id}
+  - POST /products
+  - POST /products/batch
+  - PUT /products/{id} (upsert)
+  - DELETE /products/{id}
+- [ ] `user-service` — manage users (register, get, update, delete)
+- [ ] `order-service` — manage orders, references users and products
 
-<!-- Spring Boot Test — testing support -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-test</artifactId>
-    <scope>test</scope>
-</dependency>
-```
+### optional — can revisit anytime
+- [ ] Error handling — 404 for missing resources, global exception handler
+- [ ] Input validation — @Valid, @NotNull, @Positive etc.
+- [ ] Data initializer — auto-seed database on startup
+- [ ] DTOs (Data Transfer Objects) — separate API response model from database model
+- [ ] Pagination — handle large datasets with page/size params
+
+
+## Phase 3 — Microservices Patterns
+How services communicate and coordinate with each other.
+
+- [ ] Inter-service communication — how order-service calls product-service
+- [ ] RestTemplate vs WebClient — making HTTP calls between services
+- [ ] Service discovery — how services find each other (Eureka)
+- [ ] API Gateway — single entry point for all services (Spring Cloud Gateway)
+- [ ] Circuit breaker — handling failures gracefully (Resilience4j)
+- [ ] Database per service pattern — each service owns its data
+- [ ] Eventual consistency — keeping data in sync across services
+- [ ] Strangler Fig Pattern in practice — extracting services from a monolith
+
+## Phase 4 — Docker
+Containerizing your microservices.
+
+- [ ] What Docker is and why it exists
+- [ ] Images vs containers
+- [ ] Writing a Dockerfile for a Spring Boot service
+- [ ] Building and running a Docker image
+- [ ] Docker Compose — running all services + databases together locally
+- [ ] Switching from H2 to PostgreSQL (one container per service)
+- [ ] Environment variables and configuration management
+- [ ] Docker networking — how containers talk to each other
+
+## Phase 5 — Kubernetes
+Orchestrating containers at scale.
+
+- [ ] What Kubernetes is and why it exists
+- [ ] Key concepts: pods, nodes, clusters, deployments, services
+- [ ] kubectl — the Kubernetes command line tool
+- [ ] Writing deployment YAML files
+- [ ] Services and ingress — exposing your app to the outside world
+- [ ] ConfigMaps and Secrets — managing configuration and credentials
+- [ ] Scaling — running multiple instances of a service
+- [ ] Health checks — liveness and readiness probes
+- [ ] Namespaces — organizing resources in a cluster
+- [ ] Local Kubernetes with minikube or Docker Desktop
+
+## Phase 6 — CI/CD
+Automating build, test, and deployment pipelines.
+
+- [ ] What CI/CD is and why it exists
+- [ ] GitLab CI/CD overview (you have GitLab experience)
+- [ ] `.gitlab-ci.yml` — pipeline configuration file
+- [ ] Pipeline stages: build → test → package → deploy
+- [ ] Building Docker images in the pipeline
+- [ ] Running tests automatically on every push
+- [ ] Deploying to Kubernetes from the pipeline
+- [ ] Monorepo pipeline setup — only build changed services
+- [ ] Environment-specific deployments (dev, staging, production)
+
+## Optional Topics (real world relevance)
+Things you'll likely encounter on the job that aren't in the core roadmap.
+
+- [ ] Spring Security — authentication and authorization (JWT tokens)
+- [ ] OpenAPI / Swagger — auto-generate API documentation
+- [ ] Distributed tracing — tracking requests across multiple services (Zipkin, Jaeger)
+- [ ] Centralized logging — aggregating logs from all services (ELK stack)
+- [ ] Message queues in practice — Kafka or RabbitMQ between services
+- [ ] Testing microservices — unit, integration, and contract tests
+- [ ] JUnit and Mockito — Java testing framework (Jest equivalent)
+- [ ] API versioning — managing breaking changes in your API
+- [ ] Rate limiting — protecting your services from overload
+
+## Technology Stack Summary
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| Language | Java 24 | Core language |
+| Framework | Spring Boot 3.5 | Building microservices |
+| Build tool | Maven | Dependency management |
+| ORM | Spring Data JPA | Database access |
+| Database (dev) | H2 | In-memory, no setup required |
+| Database (prod) | PostgreSQL | Persistent, one per service |
+| Containerization | Docker | Package and run services |
+| Orchestration | Kubernetes | Manage containers at scale |
+| CI/CD | GitLab CI/CD | Automate build and deploy |
+| IDE | VS Code | Development environment |
+| API testing | Postman | Test REST endpoints |
+
