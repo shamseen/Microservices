@@ -24,12 +24,24 @@ public class ProductService {
     return productRepository.saveAll(batch);
   }
 
+  public void deleteById(Long id){
+    productRepository.deleteById(id);
+  }
+
   public List<Product> getAllProducts() {
     return productRepository.findAll();
   }
 
-  public Product getProductById(Long id) {
+  public Product getById(Long id) {
     var p = productRepository.findById(id); // returns Optional<Product>
     return p.orElse(null); // null if id not found
+  }
+
+  /**
+   * @return updated product (or new if UPSERT)
+   */
+  public Product updateProduct(Long id, Product p) {
+    p.setId(id);
+    return productRepository.save(p); // save acts as UPSERT
   }
 }

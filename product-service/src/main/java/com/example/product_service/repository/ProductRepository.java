@@ -11,8 +11,9 @@ public interface ProductRepository extends JpaRepository<Product, Long>  {
    * 
    * findById() - returns Optional<Product>, not Product directly
    *  - use .orElse(null) or .orElseThrow() to unwrap
-   * save() - arg w null id = create new object + INSERT
+   * save() - (UPSERT) arg w null id = create new object + INSERT
    *  - generates new id via JPA annotation
+   *  - input w id = UPDATE
    * saveAll() - creates multiple new entities
    */
 }
