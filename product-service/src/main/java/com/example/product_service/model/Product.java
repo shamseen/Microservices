@@ -21,7 +21,8 @@ public class Product {
   // JPA annotations
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Long id;      // JPA: input w null id = create new object
+
   private String name;
   private String description;
   private Double price;

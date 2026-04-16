@@ -12,6 +12,18 @@ public class ProductService {
   @Autowired    // Spring: dependency injection
   ProductRepository productRepository; 
 
+  /**
+   * @param p
+   * @return new Product with generated id
+   */
+  public Product createProduct(Product p) {
+    return productRepository.save(p);
+  }
+
+  public List<Product> createProductBatch(List<Product> batch) {
+    return productRepository.saveAll(batch);
+  }
+
   public List<Product> getAllProducts() {
     return productRepository.findAll();
   }
