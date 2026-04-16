@@ -1,21 +1,23 @@
 package com.example.product_service.service;
 
 import com.example.product_service.model.Product;
+import com.example.product_service.repository.ProductRepository;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service          // Spring: marks as business logic layer; makes it a managed bean
+@Service        // Spring: marks as business logic layer; makes it a managed bean
 public class ProductService {
+  
+  @Autowired    // Spring: dependency injection
+  ProductRepository productRepository; 
 
   public List<Product> getAllProducts() {
-    Product p1 = new Product(1, "prod1");
-    Product p2 = new Product(2, "prod2");
-
-    List<Product> list = List.of(p1, p2);
-    return list;
+    return productRepository.findAll();
   }
 
-  public Product getProductById(int id) {
-    return new Product(id, "prod" + id);
+  public Product getProductById(Long id) {
+    var p = productRepository.findById(id); // returns Optional<Product>
+    return p.orElse(null); // null if id not found
   }
 }
